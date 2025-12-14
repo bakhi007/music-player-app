@@ -2,9 +2,8 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 
-def play_music(folder, song_name):
-
-    file_path = os.path.join(folder, song_name)
+def play_music(folder, mp3_files, start_index):
+    file_path = os.path.join(folder, mp3_files[start_index])
 
     if not os.path.exists(file_path):
         print("\nFile not found!")
@@ -13,12 +12,20 @@ def play_music(folder, song_name):
     pygame.mixer.music.load(file_path)
     pygame.mixer.music.play()
 
-    print(f"\nNow playing : {song_name}")
-    print("Commands: [P]ause, [R]esume, [S]top")
+    current_index = start_index
+
+    print(f"\nNow playing : {mp3_files[current_index]}")
+    print("""
+Commands:
+[P] Pause    [R] Resume
+[N] Next     [B] Previous
+[S] Stop
+[H] Shuffle  [L] Loop
+""")
 
     while True:
-
         command = input("> ").upper().strip()
+
         if command == 'P':
             pygame.mixer.music.pause()
             print("Paused")
@@ -26,6 +33,18 @@ def play_music(folder, song_name):
         elif command == 'R':
             pygame.mixer.music.unpause()
             print("Resumed")
+
+        elif command == 'N':
+            current_index = (current_index + 1) % len(mp3_files)
+            pygame.mixer.music.load(os.path.join(folder, mp3_files[current_index]))
+            pygame.mixer.music.play()
+            print(f"Now playing : {mp3_files[current_index]}")
+
+        elif command == 'B':
+            current_index = (current_index - 1) % len(mp3_files)
+            pygame.mixer.music.load(os.path.join(folder, mp3_files[current_index]))
+            pygame.mixer.music.play()
+            print(f"Now playing : {mp3_files[current_index]}")
 
         elif command == 'S':
             pygame.mixer.music.stop()
@@ -56,7 +75,14 @@ def main():
         print("No .mp3 files found!")    
 
     while True:
-        print("\n*****  MUSIC PLAYER  *****")
+        print("""
+███╗   ███╗██╗   ██╗███████╗██╗ ██████╗    ██████╗ ██╗      █████╗ ██╗   ██╗███████╗██████╗ 
+████╗ ████║██║   ██║██╔════╝██║██╔════╝    ██╔══██╗██║     ██╔══██╗╚██╗ ██╔╝██╔════╝██╔══██╗
+██╔████╔██║██║   ██║███████╗██║██║         ██████╔╝██║     ███████║ ╚████╔╝ █████╗  ██████╔╝
+██║╚██╔╝██║██║   ██║╚════██║██║██║         ██╔═══╝ ██║     ██╔══██║  ╚██╔╝  ██╔══╝  ██╔══██╗
+██║ ╚═╝ ██║╚██████╔╝███████║██║╚██████╗    ██║     ███████╗██║  ██║   ██║   ███████╗██║  ██║
+╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝ ╚═════╝    ╚═╝     ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+""")
         print("List:")
 
         for index, song in enumerate(mp3_files, start=1):
@@ -73,7 +99,7 @@ def main():
 
         choice = int(choice_input) - 1
         if 0 <= choice < len(mp3_files):
-            play_music(folder, mp3_files[choice])
+            play_music(folder, mp3_files, choice)
         else:
             print("\nInvalid choice")
 
